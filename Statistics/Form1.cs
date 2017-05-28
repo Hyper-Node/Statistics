@@ -114,12 +114,25 @@ namespace Statistics
 
 		private void btn_parse_Click(object sender, EventArgs e)
 		{
-            createOutputFile(); 
-			parseInputTimes(); 
-			parseXMLFile();
-			parse_stats_dataFile();
-			compareDictionaries();
-            closeOutputFile(); 
+
+            createOutputFile();
+            parseInputTimes();
+
+            if (cb_use_ip_data.Checked)
+            {
+                parseXMLFile();
+                parse_stats_dataFile();
+                compareDictionaries();
+                closeOutputFile();
+
+            }
+            else
+            {
+                parse_stats_dataFile();
+                outputIPusers();
+                closeOutputFile();
+            }
+
         }
 
 
@@ -231,7 +244,33 @@ namespace Statistics
                 logToOutput(logoutput_created);
             }
 		}
-		private bool parse_stats_dataFile()
+        private void outputIPusers()
+        {
+            int count = 0; 
+            //Just output the ip users for a dedicated timeframe make a counter 
+            foreach (KeyValuePair<string,List<DateTime>> entry in zugriffeDict)
+            {
+                string message = entry.Key.ToString() + " Seitenaufrufe: " + entry.Value.Count();
+                logToOutput(message);
+                logToOutputFile(message);
+                count++; 
+            }
+
+            if (count == 0)
+            {
+                string message = "Es gibt einfach keine Benutzer zu dieser Zeit";
+                logToOutput(message);
+                logToOutputFile(message);
+            }
+
+            if (outputFile_created)
+            {
+                string logoutput_created = "Der Output wurde auch in das File geschrieben " + filestreamToWrite.Name; ;
+                logToOutput(logoutput_created);
+            }
+        }
+
+        private bool parse_stats_dataFile()
 		{
 			try
 			{

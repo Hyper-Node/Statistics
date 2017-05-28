@@ -57,6 +57,7 @@
             this.label = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.cb_write_output_to_file = new System.Windows.Forms.CheckBox();
+            this.cb_use_ip_data = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -149,12 +150,13 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.cb_use_ip_data);
             this.groupBox2.Controls.Add(this.btn_search_ipfile);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.tb_ip_datapath);
             this.groupBox2.Location = new System.Drawing.Point(320, 27);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(195, 87);
+            this.groupBox2.Size = new System.Drawing.Size(195, 105);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Datei mit IP Daten";
@@ -246,7 +248,7 @@
             // 
             // btn_parse
             // 
-            this.btn_parse.Location = new System.Drawing.Point(326, 121);
+            this.btn_parse.Location = new System.Drawing.Point(320, 150);
             this.btn_parse.Name = "btn_parse";
             this.btn_parse.Size = new System.Drawing.Size(390, 29);
             this.btn_parse.TabIndex = 11;
@@ -346,6 +348,16 @@
             this.cb_write_output_to_file.Text = "Output in Datei schreiben";
             this.cb_write_output_to_file.UseVisualStyleBackColor = true;
             // 
+            // cb_use_ip_data
+            // 
+            this.cb_use_ip_data.AutoSize = true;
+            this.cb_use_ip_data.Location = new System.Drawing.Point(6, 80);
+            this.cb_use_ip_data.Name = "cb_use_ip_data";
+            this.cb_use_ip_data.Size = new System.Drawing.Size(115, 17);
+            this.cb_use_ip_data.TabIndex = 17;
+            this.cb_use_ip_data.Text = "IP Daten benutzen";
+            this.cb_use_ip_data.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -404,6 +416,7 @@
 		private System.Windows.Forms.Label label;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.CheckBox cb_write_output_to_file;
+        private System.Windows.Forms.CheckBox cb_use_ip_data;
     }
 }
 
