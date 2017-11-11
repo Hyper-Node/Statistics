@@ -283,6 +283,8 @@ namespace Statistics
 				string datePatern = @"\[(.*?)\]";
 				string websitePattern = tb_website_pattern.Text;//@"/Streaming.html"; //TODO make textbox for this 
 				String dateFormatString = "dd/MMMM/yyyy:HH:mm:ss";
+                long lineIndex = 0;
+                long errorCount = 0;
 
 
 				Regex regex_ip = new Regex(ipPattern, RegexOptions.IgnoreCase);
@@ -294,41 +296,64 @@ namespace Statistics
 				System.IO.StreamReader file = new System.IO.StreamReader(currentAccessLogFile);
 				while ((line = file.ReadLine()) != null)
 				{
+        
 					Match match_website = regex_website.Match(line);
 					if (match_website.Length >= 1)
 					{
-						Match match_ip = regex_ip.Match(line);
-						Match match_date = regex_date.Match(line);
+                        try
+                        {
+                            Match match_ip = regex_ip.Match(line);
+                            Match match_date = regex_date.Match(line);
 
-						//		Value	"[06/May/2017:22:40:14 +0200]"	string
-						// Dateformat dd/Month/yyyy:hh:mm:ss + 
-						String dateReduced = match_date.Value.Replace("[", "").Replace("]", "").Split('+')[0].Trim();
-						//This works with test string 
-						DateTime parsedDate = DateTime.ParseExact(dateReduced, dateFormatString, System.Globalization.CultureInfo.InvariantCulture);
-						if (timeframe_isgiven)
-						{
-							if (!(parsedDate >= datetime_start_used && parsedDate <= datetime_end_used))
-							{
-								continue; 
-							}
+                            //		Value	"[06/May/2017:22:40:14 +0200]"	string
+                            //erronous value for date reduced "07/Nov/2017:08:44:27"
+                            // Dateformat dd/Month/yyyy:hh:mm:ss + 
+                            String dateReduced = match_date.Value.Replace("[", "").Replace("]", "").Split('+')[0].Trim();
+                            if (dateReduced.Contains("/Nov/"))
+                            {
+                                dateReduced = dateReduced.Replace("/Nov/", "/November/");
+                            }
+                            //This works with test string 
+                            DateTime parsedDate = DateTime.ParseExact(dateReduced, dateFormatString, System.Globalization.CultureInfo.InvariantCulture);
+                            if (timeframe_isgiven)
+                            {
+                                if (!(parsedDate >= datetime_start_used && parsedDate <= datetime_end_used))
+                                {
+                                    continue;
+                                }
 
-						}
+                            }
 
 
-						String key = match_ip.Value.Trim(); 
-						if (!zugriffeDict.ContainsKey(key))
-						{
-							List<DateTime> times = new List<DateTime>();
-							times.Add(parsedDate);
-							zugriffeDict.Add(key, times);
-						}
-						else
-						{
-							zugriffeDict[key].Add(parsedDate); 
-						}
+                            String key = match_ip.Value.Trim();
+                            if (!zugriffeDict.ContainsKey(key))
+                            {
+                                List<DateTime> times = new List<DateTime>();
+                                times.Add(parsedDate);
+                                zugriffeDict.Add(key, times);
+                            }
+                            else
+                            {
+                                zugriffeDict[key].Add(parsedDate);
+                            }
+                        }catch(Exception ex)
+                        {
+                            if (errorCount < 3)
+                            {
+                                logToOutput("Problem beim Auslesen der Zeile: " + lineIndex + " in Datei: " + currentIPstatsFile + " Exception: " + ex.ToString());
+                            }
+                            if(errorCount == 3)
+                            {
+                                logToOutput("Problem beim Auslesen der Zeile: " + lineIndex + " zu viele Fehler, kein log ab hier mehr");
+                            }
 
-					}
-				}
+                            
+                            errorCount = errorCount + 1;
+                        }
+
+                    }
+                    lineIndex = lineIndex + 1;
+                }
 
 				file.Close();
 
