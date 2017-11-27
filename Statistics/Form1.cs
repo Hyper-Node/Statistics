@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,8 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
-
-
+using Newtonsoft.Json;
 
 namespace Statistics
 {
@@ -250,7 +250,16 @@ namespace Statistics
             //Just output the ip users for a dedicated timeframe make a counter 
             foreach (KeyValuePair<string,List<DateTime>> entry in zugriffeDict)
             {
-                string message = entry.Key.ToString() + " Seitenaufrufe: " + entry.Value.Count();
+                IpInfo info = GetUserCountryByIp(entry.Key.ToString());
+                string infoToAdd = "";
+                if (info != null)
+                {
+                    infoToAdd += info.City + "/";
+                    infoToAdd += info.Country + "/";
+                    infoToAdd += info.Org + "/";
+                    infoToAdd += info.Postal + "/";
+                }
+                string message = entry.Key.ToString() + " Seitenaufrufe: " + entry.Value.Count()+" Info: "+infoToAdd;
                 logToOutput(message);
                 logToOutputFile(message);
                 count++; 
@@ -454,5 +463,53 @@ namespace Statistics
 		{
 			tb_output_rich.Text = ""; 
 		}
-	}
+
+        public static IpInfo GetUserCountryByIp(string ip)
+        {
+            IpInfo ipInfo = new IpInfo();
+            try
+            {
+                string info = new WebClient().DownloadString("http://ipinfo.io/" + ip);
+                ipInfo = JsonConvert.DeserializeObject<IpInfo>(info);
+                RegionInfo myRI1 = new RegionInfo(ipInfo.Country);
+                ipInfo.Country = myRI1.EnglishName;
+            }
+            catch (Exception)
+            {
+
+                ipInfo = null;
+            }
+
+            return ipInfo;
+        }
+
+
+        public class IpInfo
+        {
+
+            [JsonProperty("ip")]
+            public string Ip { get; set; }
+
+            [JsonProperty("hostname")]
+            public string Hostname { get; set; }
+
+            [JsonProperty("city")]
+            public string City { get; set; }
+
+            [JsonProperty("region")]
+            public string Region { get; set; }
+
+            [JsonProperty("country")]
+            public string Country { get; set; }
+
+            [JsonProperty("loc")]
+            public string Loc { get; set; }
+
+            [JsonProperty("org")]
+            public string Org { get; set; }
+
+            [JsonProperty("postal")]
+            public string Postal { get; set; }
+        }
+    }
 }
