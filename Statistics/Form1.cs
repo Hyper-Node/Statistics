@@ -321,7 +321,17 @@ namespace Statistics
                             if (dateReduced.Contains("/Nov/"))
                             {
                                 dateReduced = dateReduced.Replace("/Nov/", "/November/");
+                            }else if (dateReduced.Contains("/Dec/"))
+                            {
+                                dateReduced = dateReduced.Replace("/Dec/", "/December/");
+                            }else if (dateReduced.Contains("/Jan/"))
+                            {
+                                dateReduced = dateReduced.Replace("/Jan/", "/January/");
+                            }else if (dateReduced.Contains("/Feb/"))
+                            {
+                                dateReduced = dateReduced.Replace("/Feb/", "/February/");
                             }
+
                             //This works with test string 
                             DateTime parsedDate = DateTime.ParseExact(dateReduced, dateFormatString, System.Globalization.CultureInfo.InvariantCulture);
                             if (timeframe_isgiven)
